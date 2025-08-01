@@ -18,6 +18,7 @@ public class ReservationController {
     @Autowired
     private ReservationService reservationService;
 
+
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
     public NewReservationDTO save(@RequestBody @Validated NewReservationDTO payload, BindingResult validationResult, @AuthenticationPrincipal User currentAuthenticatedUser) {

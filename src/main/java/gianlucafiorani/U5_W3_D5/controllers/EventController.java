@@ -50,8 +50,8 @@ public class EventController {
     @DeleteMapping("/{eventId}")
     @PreAuthorize("hasAuthority('ORGANIZER')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void getByIdAndDelete(@PathVariable UUID eventId) {
-        this.eventService.findByIdAndDelete(eventId);
+    public void getByIdAndDelete(@PathVariable UUID eventId, @AuthenticationPrincipal User currentAuthenticatedUser) {
+        this.eventService.findByIdAndDelete(eventId, currentAuthenticatedUser.getId());
     }
 }
 

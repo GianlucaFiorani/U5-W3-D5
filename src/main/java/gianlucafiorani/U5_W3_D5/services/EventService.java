@@ -30,9 +30,13 @@ public class EventService {
         return savedEvent;
     }
 
-    public void findByIdAndDelete(UUID eventId) {
+    public void findByIdAndDelete(UUID eventId, UUID organizerId) {
         Event found = this.findById(eventId);
-        this.eventRepository.delete(found);
+        if (found.getOrganizer().getId() != organizerId)
+            throw new BadRequestException("Stai cercando di modificare un evento non tuo");
+        else {
+            this.eventRepository.delete(found);
+        }
     }
 
 
