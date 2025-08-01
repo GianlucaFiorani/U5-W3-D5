@@ -6,6 +6,7 @@ import gianlucafiorani.U5_W3_D5.exceptions.ValidationException;
 import gianlucafiorani.U5_W3_D5.payloads.NewEventDTO;
 import gianlucafiorani.U5_W3_D5.payloads.NewEventRespDTO;
 import gianlucafiorani.U5_W3_D5.services.EventService;
+import gianlucafiorani.U5_W3_D5.services.ReservationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -22,6 +23,8 @@ import java.util.UUID;
 public class EventController {
     @Autowired
     private EventService eventService;
+    @Autowired
+    private ReservationService reservationService;
 
     @GetMapping
     @PreAuthorize("hasAuthority('ADMIN')")
@@ -48,6 +51,11 @@ public class EventController {
     @GetMapping("/{eventId}")
     public Event getById(@PathVariable UUID eventId) {
         return this.eventService.findById(eventId);
+    }
+
+    @GetMapping("/av:{eventId}")
+    public int placesAvailable(@PathVariable UUID eventId) {
+        return this.reservationService.placesAvailable(eventId);
     }
 
     @PutMapping("/{eventId}")

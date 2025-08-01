@@ -1,6 +1,8 @@
 package gianlucafiorani.U5_W3_D5.services;
 
+import gianlucafiorani.U5_W3_D5.entities.Event;
 import gianlucafiorani.U5_W3_D5.entities.Reservation;
+import gianlucafiorani.U5_W3_D5.entities.User;
 import gianlucafiorani.U5_W3_D5.exceptions.BadRequestException;
 import gianlucafiorani.U5_W3_D5.exceptions.NotFoundException;
 import gianlucafiorani.U5_W3_D5.payloads.NewReservationDTO;
@@ -28,11 +30,17 @@ public class ReservationService {
     private EventService eventService;
 
     public Reservation save(NewReservationDTO payload, UUID userId) {
-        if (this.reservationRepository.findByEventAndUser(eventService.findById(payload.eventId()), usersService.findById(userId)).isEmpty()) {
-            Reservation newReservation = new Reservation(eventService.findById(payload.eventId()), usersService.findById(userId));
-            Reservation savedReservation = this.reservationRepository.save(newReservation);
-            log.info("La prenotazione con id: " + savedReservation.getId() + " è stata salvata correttamente!");
-            return savedReservation;
+        User currentUser = usersService.findById(userId);
+        Event currentEvent = eventService.findById(payload.eventId());
+        if (this.reservationRepository.findByEventAndUser(currentEvent, currentUser).isEmpty()) {
+            if (this.placesAvailable(payload.eventId()) > 0) {
+                Reservation newReservation = new Reservation(currentEvent, currentUser);
+                Reservation savedReservation = this.reservationRepository.save(newReservation);
+                log.info("La prenotazione con id: " + savedReservation.getId() + " è stata salvata correttamente!");
+                return savedReservation;
+            } else {
+                throw new BadRequestException("Non ci sono più posti disponibili per questo evento");
+            }
         } else {
             throw new BadRequestException("Hai già effettuato una prenotazione per questo evento");
         }
@@ -67,5 +75,9 @@ public class ReservationService {
         else {
             this.reservationRepository.delete(found);
         }
+    }
+
+    public int placesAvailable(UUID eventId) {
+        return eventService.findById(eventId).getCapacity() - this.reservationRepository.placesBooked(eventService.findById(eventId));
     }
 }
