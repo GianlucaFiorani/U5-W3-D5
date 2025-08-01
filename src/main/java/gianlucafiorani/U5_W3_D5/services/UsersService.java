@@ -1,10 +1,13 @@
 package gianlucafiorani.U5_W3_D5.services;
 
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import gianlucafiorani.U5_W3_D5.entities.User;
 import gianlucafiorani.U5_W3_D5.exceptions.BadRequestException;
 import gianlucafiorani.U5_W3_D5.exceptions.NotFoundException;
 import gianlucafiorani.U5_W3_D5.payloads.NewUserDTO;
+import gianlucafiorani.U5_W3_D5.payloads.RoleUpdate;
 import gianlucafiorani.U5_W3_D5.repositories.UsersRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +17,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -25,6 +30,8 @@ public class UsersService {
     private UsersRepository usersRepository;
     @Autowired
     private PasswordEncoder bcrypt;
+    @Autowired
+    private Cloudinary imgUploader;
 
 
     public User save(NewUserDTO payload) {
@@ -64,6 +71,14 @@ public class UsersService {
         return modifiedUser;
     }
 
+    public User updateRole(UUID userId, RoleUpdate payload) {
+        User found = this.findById(userId);
+        found.setRole(payload.role());
+        User modifiedUser = this.usersRepository.save(found);
+        log.info("L'utente con id " + found.getId() + " ha cambiato ruolo in " + found.getRole());
+        return modifiedUser;
+    }
+
     public void findByIdAndDelete(UUID userId) {
         User found = this.findById(userId);
         this.usersRepository.delete(found);
@@ -73,4 +88,15 @@ public class UsersService {
         return this.usersRepository.findByEmail(email).orElseThrow(() -> new NotFoundException("L'utente con l'email " + email + " non è stato trovato!"));
     }
 
+    public User uploadAvatar(UUID id, MultipartFile file) {
+        try {
+            User found = this.findById(id);
+            Map result = imgUploader.uploader().upload(file.getBytes(), ObjectUtils.emptyMap());
+            String imageURL = (String) result.get("url");
+            found.setAvatarURL(imageURL);
+            return usersRepository.save(found);
+        } catch (Exception e) {
+            throw new BadRequestException("Ci sono stati problemi nel salvataggio del file!");
+        }
+    }
 }
