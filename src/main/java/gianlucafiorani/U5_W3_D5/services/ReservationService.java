@@ -1,6 +1,7 @@
 package gianlucafiorani.U5_W3_D5.services;
 
 import gianlucafiorani.U5_W3_D5.entities.Reservation;
+import gianlucafiorani.U5_W3_D5.exceptions.BadRequestException;
 import gianlucafiorani.U5_W3_D5.payloads.NewReservationDTO;
 import gianlucafiorani.U5_W3_D5.repositories.ReservationRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -21,10 +22,14 @@ public class ReservationService {
     private EventService eventService;
 
     public Reservation save(NewReservationDTO payload, UUID userId) {
-        Reservation newReservation = new Reservation(eventService.findById(payload.eventId()), usersService.findById(userId));
-        Reservation savedReservation = this.reservationRepository.save(newReservation);
-        log.info("La prenotazione con id: " + savedReservation.getId() + " è stata salvata correttamente!");
-        return savedReservation;
+        if (!this.findByUser(userId).isEmpty())
+            throw new BadRequestException("Hai già effettuato una prenotazione per questo evento");
+        else {
+            Reservation newReservation = new Reservation(eventService.findById(payload.eventId()), usersService.findById(userId));
+            Reservation savedReservation = this.reservationRepository.save(newReservation);
+            log.info("La prenotazione con id: " + savedReservation.getId() + " è stata salvata correttamente!");
+            return savedReservation;
+        }
     }
 
 
