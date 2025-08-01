@@ -1,6 +1,7 @@
 package gianlucafiorani.U5_W3_D5.exceptions;
 
 import gianlucafiorani.U5_W3_D5.payloads.ErrorsDTO;
+import gianlucafiorani.U5_W3_D5.payloads.ErrorsWithListDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authorization.AuthorizationDeniedException;
@@ -13,6 +14,13 @@ import java.time.LocalDateTime;
 @RestControllerAdvice
 @Slf4j
 public class ExceptionsHandler {
+
+    @ExceptionHandler(ValidationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorsWithListDTO handleValidationErrors(ValidationException ex) {
+
+        return new ErrorsWithListDTO(ex.getMessage(), LocalDateTime.now(), ex.getErrorMessages());
+    }
 
     @ExceptionHandler(BadRequestException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -39,4 +47,9 @@ public class ExceptionsHandler {
         return new ErrorsPayload("Errore generico, risolveremo il prima possibile", LocalDateTime.now());
     }
 
+    @ExceptionHandler(UnauthorizedException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ErrorsDTO handleUnauthorized(UnauthorizedException ex) {
+        return new ErrorsDTO(ex.getMessage(), LocalDateTime.now());
+    }
 }

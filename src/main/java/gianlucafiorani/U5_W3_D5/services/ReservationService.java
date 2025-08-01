@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -47,11 +48,11 @@ public class ReservationService {
         return this.reservationRepository.findAll(pageable);
     }
 
-    public Page<Reservation> findByUser(UUID userId) {
+    public List<Reservation> findByUser(UUID userId) {
         return this.reservationRepository.findByUser(usersService.findById(userId));
     }
 
-    public Page<Reservation> findByEvent(UUID eventId) {
+    public List<Reservation> findByEvent(UUID eventId) {
         return this.reservationRepository.findByEvent(eventService.findById(eventId));
     }
 
