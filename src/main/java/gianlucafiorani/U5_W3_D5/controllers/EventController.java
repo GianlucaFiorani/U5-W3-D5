@@ -26,7 +26,7 @@ public class EventController {
     @PostMapping("/register")
     @PreAuthorize("hasAuthority('ORGANIZER')")
     @ResponseStatus(HttpStatus.CREATED)
-    public NewEventRespDTO save(@RequestBody @Validated NewEventDTO payload, @AuthenticationPrincipal User currentAuthenticatedUser, BindingResult validationResult) {
+    public NewEventRespDTO save(@RequestBody @Validated NewEventDTO payload, BindingResult validationResult, @AuthenticationPrincipal User currentAuthenticatedUser) {
         if (validationResult.hasErrors()) {
             throw new ValidationException(validationResult.getFieldErrors()
                     .stream().map(fieldError -> fieldError.getDefaultMessage()).toList());

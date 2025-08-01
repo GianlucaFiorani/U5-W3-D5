@@ -8,11 +8,14 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
 public interface ReservationRepository extends JpaRepository<Reservation, UUID> {
-    List<Reservation> findByEvent(Event event);
+    Optional<Reservation> findByEventAndUser(Event event, User user);
 
     List<Reservation> findByUser(User user);
+
+    List<Reservation> findByEvent(Event event);
 }

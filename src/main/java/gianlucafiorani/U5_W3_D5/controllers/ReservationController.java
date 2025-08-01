@@ -20,7 +20,7 @@ public class ReservationController {
 
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
-    public NewReservationDTO save(@RequestBody @Validated NewReservationDTO payload, @AuthenticationPrincipal User currentAuthenticatedUser, BindingResult validationResult) {
+    public NewReservationDTO save(@RequestBody @Validated NewReservationDTO payload, BindingResult validationResult, @AuthenticationPrincipal User currentAuthenticatedUser) {
         if (validationResult.hasErrors()) {
             throw new ValidationException(validationResult.getFieldErrors()
                     .stream().map(fieldError -> fieldError.getDefaultMessage()).toList());
