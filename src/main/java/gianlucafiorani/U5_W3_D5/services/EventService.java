@@ -7,6 +7,10 @@ import gianlucafiorani.U5_W3_D5.payloads.NewEventDTO;
 import gianlucafiorani.U5_W3_D5.repositories.EventRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -33,7 +37,7 @@ public class EventService {
     public void findByIdAndDelete(UUID eventId, UUID organizerId) {
         Event found = this.findById(eventId);
         if (found.getOrganizer().getId() != organizerId)
-            throw new BadRequestException("Stai cercando di modificare un evento non tuo");
+            throw new BadRequestException("Stai cercando di eliminare un evento non tuo");
         else {
             this.eventRepository.delete(found);
         }
@@ -53,5 +57,11 @@ public class EventService {
             log.info("L'evento con id " + found.getId() + " è stato modificato!");
             return modifiedEvent;
         }
+    }
+
+    public Page<Event> findAll(int pageNumber, int pageSize, String sortBy) {
+        if (pageSize > 50) pageSize = 50;
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortBy).descending());
+        return this.eventRepository.findAll(pageable);
     }
 }

@@ -7,6 +7,7 @@ import gianlucafiorani.U5_W3_D5.payloads.NewEventDTO;
 import gianlucafiorani.U5_W3_D5.payloads.NewEventRespDTO;
 import gianlucafiorani.U5_W3_D5.services.EventService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -22,6 +23,14 @@ public class EventController {
     @Autowired
     private EventService eventService;
 
+    @GetMapping
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public Page<Event> findAll(@RequestParam(defaultValue = "0") int page,
+                               @RequestParam(defaultValue = "10") int size,
+                               @RequestParam(defaultValue = "id") String sortBy
+    ) {
+        return this.eventService.findAll(page, size, sortBy);
+    }
 
     @PostMapping("/register")
     @PreAuthorize("hasAuthority('ORGANIZER')")
